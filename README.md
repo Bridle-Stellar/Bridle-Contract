@@ -207,7 +207,7 @@ stellar keys generate agent --network testnet --fund
 
 # Deploy.
 stellar contract deploy \
-  --wasm target/wasm32-unknown-unknown/release/bridle_contract.wasm \
+  --wasm target/wasm32v1-none/release/bridle_contract.wasm \
   --source owner \
   --network testnet
 # -> prints the deployed contract's C... address; use it as CONTRACT_ID below.

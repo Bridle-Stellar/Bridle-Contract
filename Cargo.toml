@@ -1,0 +1,34 @@
+[package]
+name = "bridle-contract"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Bridle: on-chain spending guardrails for an autonomous AI agent's Stellar wallet."
+repository = "https://github.com/bridle-project/bridle-contract"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+doctest = false
+
+[dependencies]
+soroban-sdk = "27.0.6"
+
+[dev-dependencies]
+soroban-sdk = { version = "27.0.6", features = ["testutils"] }
+
+[profile.release]
+opt-level = "z"
+overflow-checks = true
+debug = 0
+debug-assertions = false
+panic = "abort"
+codegen-units = 1
+lto = true
+
+# Build with `cargo build --profile release-with-logs` when you need
+# panic messages and debug assertions in the wasm binary (e.g. while
+# chasing down a failing testnet invocation). Never deploy this profile.
+[profile.release-with-logs]
+inherits = "release"
+debug-assertions = true
+panic = "unwind"

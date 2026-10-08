@@ -1,5 +1,7 @@
 # Bridle Contract
 
+[![CI](https://github.com/Bridle-Stellar/Bridle-Contract/actions/workflows/ci.yml/badge.svg)](https://github.com/Bridle-Stellar/Bridle-Contract/actions/workflows/ci.yml)
+
 The on-chain policy-enforcement layer of **Bridle**. Bridle lets a human
 ("the owner") set spending guardrails for an autonomous AI agent's
 Stellar wallet; this Soroban contract is the source of truth for those

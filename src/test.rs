@@ -79,9 +79,9 @@ fn rejects_spend_over_daily_cap() {
     // Three calls at the per-call max (300 each) eat 900 of the 1_000
     // daily cap, leaving only 100 — each individually legal on its own.
     for _ in 0..3 {
-        let outcome =
-            s.client
-                .check_and_record_spend(&s.agent, &s.destination, &s.token, &300);
+        let outcome = s
+            .client
+            .check_and_record_spend(&s.agent, &s.destination, &s.token, &300);
         assert!(matches!(outcome, SpendOutcome::Approved(_)));
     }
     assert_eq!(s.client.get_spend_status().spent_today, 900);
@@ -89,9 +89,9 @@ fn rejects_spend_over_daily_cap() {
     // A fourth call for 150 is well within the per-call max, but only 100
     // remains today — it must be rejected for the daily cap, not allowed
     // through because it individually looks fine.
-    let outcome =
-        s.client
-            .check_and_record_spend(&s.agent, &s.destination, &s.token, &150);
+    let outcome = s
+        .client
+        .check_and_record_spend(&s.agent, &s.destination, &s.token, &150);
     assert_eq!(
         outcome,
         SpendOutcome::Rejected(RejectReason::ExceedsDailyCap)
@@ -104,9 +104,9 @@ fn rejects_spend_over_daily_cap() {
 fn rejects_spend_over_per_call_max() {
     let s = setup();
 
-    let outcome =
-        s.client
-            .check_and_record_spend(&s.agent, &s.destination, &s.token, &301);
+    let outcome = s
+        .client
+        .check_and_record_spend(&s.agent, &s.destination, &s.token, &301);
 
     assert_eq!(
         outcome,
@@ -135,9 +135,9 @@ fn rejects_every_spend_while_kill_switch_is_on() {
     let s = setup();
     s.client.set_kill_switch(&true);
 
-    let outcome =
-        s.client
-            .check_and_record_spend(&s.agent, &s.destination, &s.token, &1);
+    let outcome = s
+        .client
+        .check_and_record_spend(&s.agent, &s.destination, &s.token, &1);
 
     assert_eq!(
         outcome,
@@ -146,9 +146,9 @@ fn rejects_every_spend_while_kill_switch_is_on() {
 
     // Flipping it back off restores normal enforcement immediately.
     s.client.set_kill_switch(&false);
-    let outcome =
-        s.client
-            .check_and_record_spend(&s.agent, &s.destination, &s.token, &1);
+    let outcome = s
+        .client
+        .check_and_record_spend(&s.agent, &s.destination, &s.token, &1);
     assert!(matches!(outcome, SpendOutcome::Approved(_)));
 }
 
@@ -173,12 +173,9 @@ fn rejects_spend_naming_a_different_token_than_the_policy() {
     let s = setup();
     let other_token = Address::generate(&s.env);
 
-    let outcome = s.client.check_and_record_spend(
-        &s.agent,
-        &s.destination,
-        &other_token,
-        &1,
-    );
+    let outcome = s
+        .client
+        .check_and_record_spend(&s.agent, &s.destination, &other_token, &1);
 
     assert_eq!(outcome, SpendOutcome::Rejected(RejectReason::WrongToken));
 }
@@ -217,9 +214,9 @@ fn daily_cap_resets_at_the_next_calendar_day() {
 
     // ...and a full day's cap is available again for real spends, proving
     // the reset isn't just a read-side illusion.
-    let outcome =
-        s.client
-            .check_and_record_spend(&s.agent, &s.destination, &s.token, &300);
+    let outcome = s
+        .client
+        .check_and_record_spend(&s.agent, &s.destination, &s.token, &300);
     assert!(matches!(outcome, SpendOutcome::Approved(_)));
     assert_eq!(s.client.get_spend_status().spent_today, 300);
 }

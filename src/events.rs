@@ -214,7 +214,11 @@ pub fn ownership_transfer_proposed(
     .publish(env);
 }
 
-pub fn ownership_transferred(env: &soroban_sdk::Env, previous_owner: &Address, new_owner: &Address) {
+pub fn ownership_transferred(
+    env: &soroban_sdk::Env,
+    previous_owner: &Address,
+    new_owner: &Address,
+) {
     OwnershipTransferred {
         previous_owner: previous_owner.clone(),
         new_owner: new_owner.clone(),

@@ -1,0 +1,39 @@
+name: Bug report
+description: The contract does something it shouldn't, or doesn't do something it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Security issue?** Don't file it here. Use [private vulnerability reporting](https://github.com/Bridle-Stellar/Bridle-Contract/security/advisories/new) instead (see SECURITY.md).
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What did you call, and what came back (return value, event, or error)?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      description: A failing test against `src/test.rs` is best. Otherwise, the exact `stellar contract invoke` commands.
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: commit
+    attributes:
+      label: Commit or contract ID
+      description: The commit you built from, or the deployed contract ID and network.
+  - type: input
+    id: tooling
+    attributes:
+      label: Tooling versions
+      placeholder: "rustc 1.xx, stellar-cli 2x.x, soroban-sdk 27.0.6"

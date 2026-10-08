@@ -1,0 +1,27 @@
+name: Feature request
+description: Propose a new guardrail, check, or interface change.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What can an owner not do today, or what goes wrong for them? Describe the situation, not the solution.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: New or changed functions, storage, events, or reject reasons.
+    validations:
+      required: true
+  - type: textarea
+    id: interface
+    attributes:
+      label: Interface impact
+      description: Does this change any return type, event, or function signature in docs/INTERFACE.md? Bridle Backend decodes those, so say how it would need to change.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered

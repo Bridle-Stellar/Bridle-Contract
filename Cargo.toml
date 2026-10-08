@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT"
 description = "Bridle: on-chain spending guardrails for an autonomous AI agent's Stellar wallet."
-repository = "https://github.com/bridle-project/bridle-contract"
+repository = "https://github.com/Bridle-Stellar/Bridle-Contract"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

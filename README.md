@@ -1,6 +1,8 @@
 # Bridle Contract
 
 [![CI](https://github.com/Bridle-Stellar/Bridle-Contract/actions/workflows/ci.yml/badge.svg)](https://github.com/Bridle-Stellar/Bridle-Contract/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Testnet](https://img.shields.io/badge/testnet-deployed-brightgreen.svg)](docs/DEPLOYMENTS.md)
 
 The on-chain policy-enforcement layer of **Bridle**. Bridle lets a human
 ("the owner") set spending guardrails for an autonomous AI agent's
@@ -17,6 +19,48 @@ past them.
 
 This repo is **only** the contract. There's no UI, no relayer/backend
 service, and no token custody here — see [Non-goals](#non-goals) below.
+
+## Why Bridle
+
+AI agents are starting to pay for things on their own: API calls, data,
+compute, often through pay-per-request protocols like x402. Giving an
+agent a funded wallet is like handing someone your card with no limit.
+One bad prompt, a bug, or a stolen key, and it spends until the balance
+is gone. Bridle is parental controls for that wallet. The owner decides
+how much the agent can spend per day and per payment, who it is allowed
+to pay, and can freeze it with one switch. Those rules live on-chain in
+this contract, so neither the agent nor the service relaying its payments
+can quietly change them.
+
+## How it fits together
+
+Bridle is three repos. This one holds the rules; the other two use them.
+
+| Part | Repo | Stack | Role |
+|---|---|---|---|
+| **Contract** | [Bridle-Contract](https://github.com/Bridle-Stellar/Bridle-Contract) (this repo) | Rust, Soroban | Stores the owner's policy and is the final authority on every spend. |
+| **Backend** | [Bridle-Backend](https://github.com/Bridle-Stellar/Bridle-Backend) | Python | Relayer between the agent and the merchant. Asks this contract before forwarding any payment, and ships a client SDK for agents. |
+| **Frontend** | [Bridle-Frontend](https://github.com/Bridle-Stellar/Bridle-Frontend) | TypeScript | Owner dashboard. Shows spend and history, and edits policy with Freighter-signed transactions. |
+
+A spend, end to end:
+
+```text
+agent ──signs request──▶ Backend ──check_and_record_spend──▶ Contract
+                            │                                   │
+                            │◀──── Approved / Rejected(reason) ─┘  (+ spend_* event)
+                            │
+              Approved ─▶ forwards SEP-41 transfer to the merchant
+              Rejected ─▶ stops; nothing moves
+```
+
+The owner changes rules from the Frontend, which builds the transaction
+through the Backend and has the owner sign it. Only the owner's
+signature can change policy.
+
+**On-chain proof:** the contract is deployed on Stellar testnet. The
+contract ID and the transaction hashes for an approved spend, an over-cap
+rejection, and a kill-switch toggle are in
+[docs/DEPLOYMENTS.md](docs/DEPLOYMENTS.md).
 
 ## What it enforces
 
@@ -111,6 +155,9 @@ open.
 
 ## Contract interface
 
+The exact ScVal encoding of every return type and event, with real
+examples from testnet, is in [docs/INTERFACE.md](docs/INTERFACE.md).
+
 | Function | Caller | Effect |
 |---|---|---|
 | `initialize(owner, agent, token, daily_cap, per_call_max)` | owner (once) | Sets up the contract. Kill switch starts off, allowlist starts empty. |
@@ -157,9 +204,9 @@ destination without decoding data payloads.
 
 ## Non-goals
 
-- No UI or dashboard (see Bridle Frontend).
+- No UI or dashboard (see [Bridle Frontend](https://github.com/Bridle-Stellar/Bridle-Frontend)).
 - No relayer/backend service beyond what's needed to exercise the
-  contract in tests (see Bridle Backend).
+  contract in tests (see [Bridle Backend](https://github.com/Bridle-Stellar/Bridle-Backend)).
 - No token custody: this contract only *authorizes* — it never holds or
   moves tokens. The relayer performs the actual SEP-41 transfer via the
   standard Soroban token contract once `check_and_record_spend` returns
@@ -198,6 +245,9 @@ The optimized artifact lands at
 `target/wasm32v1-none/release/bridle_contract.wasm`.
 
 ## Deploy to Testnet
+
+A live testnet deployment, with every command and transaction hash, is
+recorded in [docs/DEPLOYMENTS.md](docs/DEPLOYMENTS.md). To deploy your own:
 
 ```bash
 # One-time: configure the testnet network and an identity.
@@ -273,4 +323,19 @@ src/
   errors.rs   hard-failure error codes (bad config/input, not policy declines)
   events.rs   every event this contract emits, one function per event
   test.rs     behavioral tests
+docs/
+  INTERFACE.md    exact ScVal encoding of returns, events, errors
+  DEPLOYMENTS.md  testnet deployments and their transaction hashes
 ```
+
+## Contributing
+
+Issues labelled
+[`good first issue`](https://github.com/Bridle-Stellar/Bridle-Contract/labels/good%20first%20issue)
+are a good place to start. See [CONTRIBUTING.md](CONTRIBUTING.md) for how
+to build, test, and claim an issue. Report vulnerabilities privately; see
+[SECURITY.md](SECURITY.md).
+
+## License
+
+[MIT](LICENSE)
